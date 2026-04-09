@@ -1,21 +1,15 @@
 package com.jaydeep.backend.controller;
 
+import com.jaydeep.backend.dto.HealthResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 public class HealthController {
     @GetMapping("/api/health")
-    public Map getHealth()
+    public HealthResponse getHealth()
     {
-        Map<String,String> res=new HashMap<>();
-        res.put("status","UP");
-        res.put("message","Application is running");
-
-        return res;
+        return new HealthResponse("UP","Application is running");
     }
 
 }
