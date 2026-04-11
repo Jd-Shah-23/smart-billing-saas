@@ -1,11 +1,16 @@
 package com.jaydeep.backend.service;
 
+import com.jaydeep.backend.dto.PageResponse;
 import com.jaydeep.backend.dto.UserRequest;
 import com.jaydeep.backend.dto.UserResponse;
 import com.jaydeep.backend.entity.User;
 import com.jaydeep.backend.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import org.springframework.data.domain.Pageable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -18,16 +23,34 @@ public class UserService {
         this.userRepository=repo;
     }
 
-    public List<UserResponse> getUsers()
+    public PageResponse<List<UserResponse>> getAllUsers(int pageNumber, int pageSize, String sortBy, String direction, String email)
     {
-        List<User> users=this.userRepository.findAll();
-        List<UserResponse> userResponse=new ArrayList<>();
-
-        for (User user : users) {
-            userResponse.add(mapToResponse(user));
+        List<String> allowedFields = List.of("id", "name", "email");
+        if (!allowedFields.contains(sortBy)) {
+            throw new IllegalArgumentException("Invalid sort field: " + sortBy);
         }
 
-        return userResponse;
+        Pageable pageable= PageRequest.of(pageNumber,pageSize,direction.equalsIgnoreCase("desc")
+                        ? Sort.by(sortBy).descending()
+                        : Sort.by(sortBy).ascending());
+
+        Page<User> page=email!=null && !email.isBlank()
+                        ? this.userRepository.findByEmail(email,pageable)
+                        : this.userRepository.findAll(pageable);
+
+        List<User> users=page.getContent();
+        List<UserResponse> userResponse=users.stream()
+                .map(this::mapToResponse)
+                .toList();
+
+        return new PageResponse<>(
+                "User fetch successfully.",
+                userResponse,
+                pageNumber,
+                pageSize,
+                page.getTotalElements(),
+                page.getTotalPages()
+        );
     }
 
     public UserResponse createUser(UserRequest userRequest)
