@@ -33,8 +33,11 @@ public class User {
     private List<Customer> customers;
 
     public User(String loginId,String name, String email, String userPassword,String userCity) {
+        this.loginId=loginId;
         this.userName = name;
         this.userEmail = email;
+        this.userPassword = userPassword;
+        this.userCity = userCity;
     }
 
     @PrePersist

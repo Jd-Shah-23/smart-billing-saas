@@ -1,5 +1,6 @@
 package com.jaydeep.backend.entity;
 
+import com.jaydeep.backend.repository.UserRepository;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,7 +21,6 @@ public class Customer {
     private Long customerId;
     private String customerName;
     private String customerEmail;
-    private String customerPassWord;
     private String customerCity;
     private LocalDateTime createDate;
 
@@ -37,6 +37,14 @@ public class Customer {
     public void prePersist() {
         this.createDate = LocalDateTime.now();
         this.activeFlag = true;
+    }
+
+    public Customer(String customerName,String customerEmail,String customerCity,User user)
+    {
+        this.customerName=customerName;
+        this.customerEmail=customerEmail;
+        this.customerCity=customerCity;
+        this.user=user;
     }
 
 }

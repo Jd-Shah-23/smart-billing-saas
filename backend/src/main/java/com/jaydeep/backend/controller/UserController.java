@@ -28,16 +28,16 @@ public class UserController {
     @GetMapping("/api/users")
     public ResponseEntity<PageResponse<List<UserResponse>>> getAllUsers(@RequestParam(defaultValue = "0") int page,
                                                                         @RequestParam(defaultValue = "10") int size,
-                                                                        @RequestParam(defaultValue = "name") String sortBy,
+                                                                        @RequestParam(defaultValue = "userName") String sortBy,
                                                                         @RequestParam(defaultValue = "asc") String direction,
-                                                                        @RequestParam(required = false) String email)
+                                                                        @RequestParam(required = false) String userEmail)
     {
         return ResponseEntity.ok(
-                userService.getAllUsers(page,size,sortBy,direction,email)
+                userService.getAllUsers(page,size,sortBy,direction,userEmail)
         );
     }
 
-    @PostMapping("/api/users")
+    @PostMapping("/api/adduser")
     public ResponseEntity<UserResponse> createUser(@Valid @RequestBody UserRequest userRequest)
     {
         UserResponse response = userService.createUser(userRequest);
@@ -67,7 +67,7 @@ public class UserController {
         return response!=null ? ResponseEntity.ok(response) : ResponseEntity.notFound().build();
     }
 
-    @DeleteMapping("/api/users/{id}")
+    @DeleteMapping("/api/deleteuser/{id}")
     public ResponseEntity<Void> deleteById(@PathVariable Long id)
     {
         return userService.deleteById(id) ? ResponseEntity.noContent().build(): ResponseEntity.notFound().build();

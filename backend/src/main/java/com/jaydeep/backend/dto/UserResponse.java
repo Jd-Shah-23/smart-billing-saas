@@ -9,6 +9,8 @@ import lombok.Setter;
 @Setter
 public class UserResponse {
     private final Long id;
-    private final String name;
-    private final String email;
+    private final String userName;
+    private final String userEmail;
+    private final String userCity;
+
 }

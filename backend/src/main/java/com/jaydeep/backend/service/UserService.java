@@ -25,7 +25,7 @@ public class UserService {
 
     public PageResponse<List<UserResponse>> getAllUsers(int pageNumber, int pageSize, String sortBy, String direction, String email)
     {
-        List<String> allowedFields = List.of("id", "name", "email");
+        List<String> allowedFields = List.of("id", "userName", "userEmail","userCity");
         if (!allowedFields.contains(sortBy)) {
             throw new IllegalArgumentException("Invalid sort field: " + sortBy);
         }
@@ -35,7 +35,7 @@ public class UserService {
                         : Sort.by(sortBy).ascending());
 
         Page<User> page=email!=null && !email.isBlank()
-                        ? this.userRepository.findByEmail(email,pageable)
+                        ? this.userRepository.findByUserEmail(email,pageable)
                         : this.userRepository.findAll(pageable);
 
         List<User> users=page.getContent();
@@ -64,7 +64,7 @@ public class UserService {
         UserResponse userResponse=null;
         if(optional.isPresent())
         {
-            userResponse=new UserResponse(optional.get().getId(), optional.get().getName(), optional.get().getEmail());
+            userResponse=new UserResponse(optional.get().getUserId(), optional.get().getUserName(), optional.get().getUserEmail(),optional.get().getUserCity());
         }
         return userResponse;
 
@@ -77,8 +77,8 @@ public class UserService {
         if(optional.isPresent())
         {
             User upUser=optional.get();
-            upUser.setName(userRequest.getName());
-            upUser.setEmail(userRequest.getEmail());
+            upUser.setUserName(userRequest.getUserName());
+            upUser.setUserEmail(userRequest.getUserEmail());
             return mapToResponse(this.userRepository.save(upUser));
         }
         return null;
@@ -101,11 +101,11 @@ public class UserService {
 
     private User mapToEntity(UserRequest request)
     {
-        return new User(request.getName(), request.getEmail());
+        return new User(request.getLoginId(),request.getUserName(), request.getUserEmail(),request.getUserPassword(),request.getUserCity());
     }
 
     private UserResponse mapToResponse(User user)
     {
-        return new UserResponse(user.getId(),user.getName(),user.getEmail());
+        return new UserResponse(user.getUserId(),user.getUserName(),user.getUserEmail(),user.getUserCity());
     }
 }
