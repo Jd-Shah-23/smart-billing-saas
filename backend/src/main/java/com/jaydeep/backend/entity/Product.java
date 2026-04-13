@@ -20,7 +20,7 @@ public class Product {
     private String productName;
     private double productPrice;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "gst_id")
     private GstDetails gstDetails;
 }

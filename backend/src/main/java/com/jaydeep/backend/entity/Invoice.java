@@ -34,16 +34,22 @@ public class Invoice {
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
-    @OneToMany(mappedBy = "invoice")
+    @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<InvoiceItem> invoiceItems;
 
     @PrePersist
     public void prePersist() {
         this.createDate = LocalDateTime.now();
-        this.paidAmount = 0;
-        if (this.invoiceTotal != 0) {
-            this.remainingAmount = this.invoiceTotal;
-        }
+    }
+
+    public Invoice(double invoiceNetAmount,double invoiceTotalGst,double invoiceTotal,double paidAmount,double remainingAmount,String invoiceStatus)
+    {
+        this.invoiceNetAmount=invoiceNetAmount;
+        this.invoiceTotalGst=invoiceTotalGst;
+        this.invoiceTotal=invoiceTotal;
+        this.paidAmount=paidAmount;
+        this.remainingAmount=remainingAmount;
+        this.invoiceStatus=invoiceStatus;
     }
 
 }

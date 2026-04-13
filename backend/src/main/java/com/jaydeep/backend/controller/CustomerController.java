@@ -1,18 +1,15 @@
 package com.jaydeep.backend.controller;
 
-import com.jaydeep.backend.dto.CustomerResponse;
-import com.jaydeep.backend.dto.PageResponse;
-import com.jaydeep.backend.dto.UserResponse;
+import com.jaydeep.backend.dto.*;
 import com.jaydeep.backend.service.CustomerService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+import static org.springframework.http.HttpStatus.CREATED;
 
 @RestController
 public class CustomerController {
@@ -21,15 +18,21 @@ public class CustomerController {
     {
         this.customerService=customerService;
     }
-    @GetMapping("api/customers")
+    @GetMapping("/api/customers")
     public ResponseEntity<PageResponse<List<CustomerResponse>>> getAllCustomer(@RequestParam(defaultValue = "0") int page,
                                                 @RequestParam(defaultValue = "10") int size,
                                                 @RequestParam(defaultValue = "customerName") String sortBy,
                                                 @RequestParam(defaultValue = "asc") String direction,
                                                 @RequestParam(required = false) String customerEmail,
-                                                @RequestParam(required = true) @NotNull Long userId)
+                                                @RequestParam(required = true) @NotNull(message = "UserId required.") Long userId)
     {
         return ResponseEntity.ok(this.customerService.getAllCustomer(page,size,sortBy,direction,customerEmail,userId));
+    }
+
+    @PostMapping("/api/addcustomer")
+    public ResponseEntity<CustomerResponse> addCustomer(@Valid @RequestBody CustomerRequest customerRequest,@RequestParam Long userId) {
+        CustomerResponse response=this.customerService.addCustomer(customerRequest,userId);
+        return ResponseEntity.status(CREATED).body(response);
     }
 
 }

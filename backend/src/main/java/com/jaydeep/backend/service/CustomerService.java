@@ -1,16 +1,17 @@
 package com.jaydeep.backend.service;
 
+import com.jaydeep.backend.dto.CustomerRequest;
 import com.jaydeep.backend.dto.CustomerResponse;
 import com.jaydeep.backend.dto.PageResponse;
 import com.jaydeep.backend.entity.Customer;
 import com.jaydeep.backend.entity.User;
+import com.jaydeep.backend.exception.ParentNotFoundException;
 import com.jaydeep.backend.repository.CustomerRepository;
 import com.jaydeep.backend.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,10 +20,12 @@ import java.util.Optional;
 @Service
 public class CustomerService {
     private final CustomerRepository customerRepository;
+    private final UserRepository userRepository;
 
     public CustomerService(CustomerRepository customerRepository,UserRepository userRepository)
     {
         this.customerRepository=customerRepository;
+        this.userRepository=userRepository;
     }
     public PageResponse<List<CustomerResponse>> getAllCustomer(int pageNumber,int pageSize,String sortBy,String direction,String customerEmail,Long id)
     {
@@ -46,9 +49,25 @@ public class CustomerService {
         );
     }
 
+    public CustomerResponse addCustomer(CustomerRequest customerRequest,Long userId) {
+        CustomerResponse customerResponse;
+        Optional<User> optional=this.userRepository.findById(userId);
+        if(!optional.isPresent())
+        {
+            throw new ParentNotFoundException("UserId","User not found with given userId :  " + userId);
+        }
+        Customer customer=mapToEntity(customerRequest);
+        customer.setUser(optional.get());
+        return maptoResponse(this.customerRepository.save(customer));
+    }
+
     private CustomerResponse maptoResponse(Customer customer)
     {
         return new CustomerResponse(customer.getCustomerId(),customer.getCustomerName(),customer.getCustomerEmail(),customer.getCustomerCity());
     }
 
+    private Customer mapToEntity(CustomerRequest request)
+    {
+        return new Customer(request.getCustomerName(),request.getCustomerEmail(), request.getCustomerCity());
+    }
 }

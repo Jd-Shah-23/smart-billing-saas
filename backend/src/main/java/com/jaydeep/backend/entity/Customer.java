@@ -39,12 +39,11 @@ public class Customer {
         this.activeFlag = true;
     }
 
-    public Customer(String customerName,String customerEmail,String customerCity,User user)
+    public Customer(String customerName,String customerEmail,String customerCity)
     {
         this.customerName=customerName;
         this.customerEmail=customerEmail;
         this.customerCity=customerCity;
-        this.user=user;
     }
 
 }
